@@ -1,4 +1,4 @@
-package game
+package league
 
 import (
 	"github.com/brandonmay693/soccer-league-golang/models"

@@ -5,7 +5,18 @@ type Score struct {
 	Score int
 }
 
-type RankedGameResult struct {
+type MatchResult struct {
 	TeamA Score
 	TeamB Score
+}
+
+type LeagueScore struct {
+	Team           string
+	Score          int
+	GoalDifference int
+}
+
+type RankedGameResult struct {
+	TeamA LeagueScore
+	TeamB LeagueScore
 }
