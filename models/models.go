@@ -20,3 +20,7 @@ type RankedGameResult struct {
 	TeamA LeagueScore
 	TeamB LeagueScore
 }
+
+type Environment struct {
+	ScoreInputFilePath string `env:"SCORE_FILE_PATH"`
+}

@@ -24,6 +24,7 @@ func NewFileConsumer(fileLocation string) FileConsumer {
 }
 
 func (f FileConsumer) Read() ([]models.MatchResult, error) {
+
 	file, err := os.Open(f.FileLocation)
 	if err != nil {
 		log.Fatal(err)
