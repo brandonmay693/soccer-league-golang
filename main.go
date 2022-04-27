@@ -6,6 +6,7 @@ import (
 	"github.com/brandonmay693/soccer-league-golang/consumer"
 	l "github.com/brandonmay693/soccer-league-golang/league"
 	"github.com/brandonmay693/soccer-league-golang/models"
+	"os"
 )
 
 func main() {
@@ -15,6 +16,12 @@ func main() {
 		panic(err)
 	}
 
+	if len(os.Args) > 1 {
+		//Overwrite environment variables with CMD
+		config.ScoreInputFilePath = os.Args[1]
+	}
+
+	fmt.Println(config.ScoreInputFilePath)
 	c := consumer.NewFileConsumer(config.ScoreInputFilePath)
 
 	gameResults, err := c.Read()
