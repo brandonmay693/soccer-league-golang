@@ -1,7 +1,6 @@
 package league
 
 import (
-	"fmt"
 	"github.com/brandonmay693/soccer-league-golang/models"
 	"sort"
 	"unicode/utf8"
@@ -9,7 +8,14 @@ import (
 
 type League interface {
 	RankGameResult(a models.Score, b models.Score) models.RankedGameResult
-	GenerateRankingTable([]models.MatchResult)
+	GenerateRankingTable([]models.MatchResult) sort.Interface
+}
+
+type LeaderBoard interface {
+	Len() int
+	Less(i, j int) bool
+	Get(i int) models.LeagueScore
+	Swap(i, j int)
 }
 
 type BasicLeague struct {
@@ -31,7 +37,7 @@ func NewBasicLeague(tiePoints int, winnerPts int, loserPts int) BasicLeague {
 func (l *BasicLeague) RankGameResult(a models.Score, b models.Score) models.RankedGameResult {
 
 	if a.Score == b.Score {
-		fmt.Println(fmt.Sprintf("we have a tie! awarding both %s and %s %d points", a.Team, b.Team, l.TiePts))
+		//fmt.Println(fmt.Sprintf("we have a tie! awarding both %s and %s %d points", a.Team, b.Team, l.TiePts))
 		return models.RankedGameResult{
 			TeamA: models.LeagueScore{
 				Team:           a.Team,
@@ -47,7 +53,7 @@ func (l *BasicLeague) RankGameResult(a models.Score, b models.Score) models.Rank
 	}
 
 	if a.Score > b.Score {
-		fmt.Println(fmt.Sprintf("%s beat %s, awarding %d and %d respectively", a.Team, b.Team, l.WinnerPts, l.LoserPts))
+		//fmt.Println(fmt.Sprintf("%s beat %s, awarding %d and %d respectively", a.Team, b.Team, l.WinnerPts, l.LoserPts))
 		return models.RankedGameResult{
 			TeamA: models.LeagueScore{
 				Team:           a.Team,
@@ -61,7 +67,7 @@ func (l *BasicLeague) RankGameResult(a models.Score, b models.Score) models.Rank
 			},
 		}
 	} else {
-		fmt.Println(fmt.Sprintf("%s beat %s, awarding %d and %d respectively", b.Team, a.Team, l.WinnerPts, l.LoserPts))
+		//fmt.Println(fmt.Sprintf("%s beat %s, awarding %d and %d respectively", b.Team, a.Team, l.WinnerPts, l.LoserPts))
 		return models.RankedGameResult{
 			TeamA: models.LeagueScore{
 				Team:           a.Team,
@@ -77,13 +83,13 @@ func (l *BasicLeague) RankGameResult(a models.Score, b models.Score) models.Rank
 	}
 }
 
-type basicLeagueTable []models.LeagueScore
+type BasicLeagueTable []models.LeagueScore
 
-func (a basicLeagueTable) Len() int {
+func (a BasicLeagueTable) Len() int {
 	return len(a)
 }
 
-func (a basicLeagueTable) Less(i, j int) bool {
+func (a BasicLeagueTable) Less(i, j int) bool {
 
 	if a[i].Score == a[j].Score {
 		iRune, _ := utf8.DecodeRuneInString(a[i].Team)
@@ -96,11 +102,15 @@ func (a basicLeagueTable) Less(i, j int) bool {
 	return a[i].Score > a[j].Score
 }
 
-func (a basicLeagueTable) Swap(i, j int) {
+func (a BasicLeagueTable) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
 }
 
-func (l *BasicLeague) GenerateRankingTable(gameResults []models.MatchResult) {
+func (a BasicLeagueTable) Get(i int) models.LeagueScore {
+	return a[i]
+}
+
+func (l *BasicLeague) GenerateRankingTable(gameResults []models.MatchResult) LeaderBoard {
 	var scoreMap = map[string]models.LeagueScore{}
 	for _, r := range gameResults {
 		rgr := l.RankGameResult(r.TeamA, r.TeamB)
@@ -109,15 +119,14 @@ func (l *BasicLeague) GenerateRankingTable(gameResults []models.MatchResult) {
 		handleAddScoreToMap(scoreMap, rgr.TeamB)
 	}
 
-	var leagueTable basicLeagueTable
+	var leagueTable BasicLeagueTable
 	for _, element := range scoreMap {
 		leagueTable = append(leagueTable, element)
 	}
 
 	sort.Sort(leagueTable)
-	for i := 0; i < len(leagueTable); i++ {
-		fmt.Println(fmt.Sprintf("%d. %s, %d pts", i+1, leagueTable[i].Team, leagueTable[i].Score))
-	}
+
+	return leagueTable
 }
 
 func handleAddScoreToMap(scoreMap map[string]models.LeagueScore, ls models.LeagueScore) {
