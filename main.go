@@ -34,6 +34,12 @@ func main() {
 	rankingTable := league.GenerateRankingTable(gameResults)
 
 	for i := 0; i < rankingTable.Len(); i++ {
-		fmt.Println(fmt.Sprintf("%d. %s, %d pts", i+1, rankingTable.Get(i).Team, rankingTable.Get(i).Score))
+		var pointStr string
+		if rankingTable.Get(i).Score == 1 {
+			pointStr = "pt"
+		} else {
+			pointStr = "pts"
+		}
+		fmt.Println(fmt.Sprintf("%d. %s, %d %s", i+1, rankingTable.Get(i).Team, rankingTable.Get(i).Score, pointStr))
 	}
 }
